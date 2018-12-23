@@ -100,7 +100,7 @@ $ python sudoku.py -i easy_10_sudoku.txt
 
 ### Test Cases
 - Huge thanks to this [site](https://warwick.ac.uk/fac/sci/moac/people/students/peter_cock/python/sudoku/) for providing a collection of some easy and mostly hard sudoku puzzles. I have used them for testing purposes.
-- I also tested this solver using the 10 most difficult sudoku puzzles according to [AIroot technique](http://www.aisudoku.com/index_en.html). Thanks, [Arto Inkala](http://www.aisudoku.com/index_en.html).
+- I also tested this solver using the 10 most difficult sudoku puzzles according to [AIroot technique](http://www.aisudoku.com/en/AIwME.html). Thanks, [Arto Inkala](http://www.aisudoku.com/index_en.html).
 
 ### Observations
 
