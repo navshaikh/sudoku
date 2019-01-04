@@ -304,7 +304,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Sudoku solver',
                                     epilog=example,
                                     formatter_class=argparse.RawDescriptionHelpFormatter)
-    group = parser.add_mutually_exclusive_group()
+    group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-i', '--input', \
                         help='Input text file containing 81 char sudoku string, one per line')
     group.add_argument('puzzle', type=str, nargs='?', \
