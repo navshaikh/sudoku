@@ -217,7 +217,7 @@ def reduce(grid):
 
     return grid
 
-def search(grid, depth):
+def search(grid, randomize_traversal, depth=0):
 
     # Track max depth we hit using this approach
     global max_depth
@@ -253,13 +253,14 @@ def search(grid, depth):
     # invalid state by assigning this value.
     possibilities = list(grid[min_ndx])
 
-    random.shuffle(possibilities)
+    if randomize_traversal:
+        random.shuffle(possibilities)
 
     for p in possibilities:
         recurse_grid = grid.copy()
         recurse_grid[min_ndx] = {p}
 
-        results = search(recurse_grid, depth+1)
+        results = search(recurse_grid, randomize_traversal, depth+1)
 
         if results:
             # If we reach here, we have a successful assignment
@@ -268,7 +269,7 @@ def search(grid, depth):
     return False
 
 
-def solve(sudoku):
+def solve(sudoku, randomize_traversal=False):
     """ 
     Solve sudoku!
 
@@ -279,7 +280,8 @@ def solve(sudoku):
     """ 
     _ = validate(sudoku)
 
-    return grid_to_str(search(str_to_grid(sudoku, fill_possibilities=True), 0))
+    grid = str_to_grid(sudoku, fill_possibilities=True)
+    return grid_to_str(search(grid, randomize_traversal=randomize_traversal))
 
 # Initialize and identify adjacents for all cells
 for row in range(0,9):
@@ -315,6 +317,8 @@ if __name__ == '__main__':
     p_group.add_argument('-df', '--dfprint', action='store_true', \
                         help='Print sudoku and its solution in dataframe-friendly \
                             format. Headers included')
+    p_group.add_argument('-r', '--randomize', action='store_true', \
+                        help='Randomize tree traversal when solving. For fun!')
 
     args = parser.parse_args()
 
@@ -335,7 +339,7 @@ if __name__ == '__main__':
             continue
 
         start = time.time()
-        solution = solve(sudoku)
+        solution = solve(sudoku, args.randomize)
         end = time.time()
 
         if is_solved(solution):
