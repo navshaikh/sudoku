@@ -1,42 +1,46 @@
-import time
 import argparse
+import random
+import time
 
 # Max depth of the search tree
 max_depth = 0
 
 adjacents = {}
 
+class InvalidSudokuError(Exception):
+    """ 
+    Raised when input sudoku is invalid. 
+    Invalid cases are: 1) Length of string representing sudoku is not 81 chars
+    2) Initially assigned values (also called clues) do not have conflicting
+    cases (e.g: two 3s in a row).
+    """ 
+    pass
+
 def str_to_grid(input, fill_possibilities=False):
-    '''
-    Convert a 81 character string sequence representing sudoku into a grid (dict)
+    """ 
+    Convert an 81-char string sequence representing sudoku into a grid (dict)
     with keys as indexes [0-80] and values as possible assignments. Valid values
-    are in [1-9] for filled cells. All other characters represent an empty cell.
-    '''
+    are [1-9] for filled cells. All other characters represent an empty cell.
+    """ 
     if len(input) != 81:
         return None
 
     possibilities = set(range(1,10)) if fill_possibilities else set()
 
-    return { ndx: {int(s)} if s in '123456789' else possibilities \
-            for ndx, s in enumerate(input) }
+    return {ndx: {int(s)} if s in '123456789' else possibilities \
+            for ndx, s in enumerate(input)}
 
 def grid_to_str(grid):
-    '''
-    Convert solved grid - our internal representation into 81 character sudoku string
-    '''
-    if not is_solved(grid):
-        return None
-
+    """ Convert grid - our internal representation into an 81-char sudoku string """
     return ''.join(str(grid[ndx].pop()) for ndx in range(0,81))
 
-
 def display(input, msg=None):
-    '''
+    """ 
     Pretty print sudoku to stdout with an optional message.
 
     input: 81 characters of sudoku sequence or a dict with keys [0-80] and possible
             assignments as values
-    '''
+    """ 
     grid = str_to_grid(input) if type(input) == str else input
 
     if msg:
@@ -73,10 +77,10 @@ def display(input, msg=None):
     print result + '\n'
 
 def get_square_indices(row, col):
-    '''
+    """ 
     Given row and col of a cell, find all adjacent cells in its square.
     Return a list of zero-based indices
-    '''
+    """ 
     sq_row, sq_col = row/3, col/3
     # Identify the start location of square index in the grid
     sq_start_ndx = (sq_row*9*3) + (sq_col*3)
@@ -84,33 +88,26 @@ def get_square_indices(row, col):
 
     return sq_indices
 
-def is_solved(grid):
-    return all(len(grid[n]) == 1 for n in grid)
+def is_solved(sudoku):
+    """
+    Return True if sudoku (81 character input) is solved, False otherwise if
+    some characters (cells) are still unsolved.
+    If input is invalid, raise InvalidSudokuError.
+    """ 
+    _ = validate(sudoku)
+    
+    # The logic is that if we didn't find any conflict in the input sudoku
+    # and all 81 characters are digits, it's a solved sudoku.  
+    return sudoku.isdigit()
 
-def is_valid_solution(grid):
-    # Test every row
-    for r in range(0,9):
-        if {1,2,3,4,5,6,7,8,9} != set.union(*[grid[r*9+c] for c in range(0,9)]):
-            return False
-
-    # Test every column
-    for c in range(0,9):
-        if {1,2,3,4,5,6,7,8,9} != set.union(*[grid[c+r*9] for c in range(0,9)]):
-            return False
-
-    # Test every square
-    # Following are the starting indices of squares
-    for s in [0,3,6,27,30,33,54,57,60]:
-        if {1,2,3,4,5,6,7,8,9} != set.union(*[grid[(s+c)+(r*9)] for r in range(0,3) for c in range(0,3)]):
-            return False
-
-    return True
-
-def is_valid_input(sudoku):
+def validate(sudoku):
+    """ 
+    Returns True if input 81-char sudoku string is valid (like no repeating 
+    chars in any row), raises InvalidSudokuError otherwise.
+    """
     # Ensure input string is always 81 characters
-    if len(sudoku) != 81:
-        print 'ERROR: Invalid input. Input length is {0}'.format(len(sudoku))
-        return False
+    if not sudoku or len(sudoku) != 81:
+        raise InvalidSudokuError('Input length is {0}. Expecting 81 characters'.format(len(sudoku)))
 
     # Ensure that initially assigned values do not have conflict.
     # E.g: repeating number in a row, col, square
@@ -121,26 +118,25 @@ def is_valid_input(sudoku):
             row_occurrences = [l for l,su in enumerate(sudoku[row*9:row*9+9]) if s==su]
 
             if len(row_occurrences) > 1:
-                print 'ERROR: Invalid input. {0} appears {1}x in row {2}'.format(s,len(row_occurrences), row)
-                return False
+                raise InvalidSudokuError('{0} appears {1}x in row {2}'. \
+                                        format(s, len(row_occurrences), row+1)) 
 
             col_occurrences = [l for l,su in enumerate(sudoku[col::9]) if s==su]
 
             if len(col_occurrences) > 1:
-                print 'ERROR: Invalid input. {0} appears {1}x in col {2}'.format(s,len(col_occurrences), col)
-                return False
+                raise InvalidSudokuError('{0} appears {1}x in col {2}'. \
+                                        format(s, len(col_occurrences), col+1)) 
 
             sq_indices = get_square_indices(row, col)
-            sq_occurences = [l for l,su in enumerate(''.join(sudoku[x] for x in sq_indices)) if s==su]
+            sq_occurrences = [l for l,su in enumerate(''.join(sudoku[x] for x in sq_indices)) if s==su]
 
-            if len(sq_occurences) > 1:
-                print 'ERROR: Invalid input. {0} appears {1}x in a square'.format(s, len(sq_occurences))
-                return False
-
+            if len(sq_occurrences) > 1:
+                raise InvalidSudokuError('{0} appears {1}x in a square'. \
+                                        format(s, len(sq_occurrences))) 
     return True
 
 def eliminate(grid, cell):
-    '''
+    """ 
     Given a cell in sudoku's current state, reduce possible digits by:
      1) Removing solved digits from cell's row, col and square
      2) Determining unique value looking at row, col and square - one at a time
@@ -157,7 +153,7 @@ def eliminate(grid, cell):
 
     Returns the new possible digits for the cell as a set or False if
         sudoku reaches an invalid state
-    '''
+    """ 
     possibilities = grid[cell]
 
     if len(possibilities) == 1:
@@ -194,13 +190,13 @@ def eliminate(grid, cell):
     return possibilities
 
 def reduce(grid):
-    '''
+    """ 
     Iterate through all cells in the grid and eliminate possibilities to create
     a reduced grid
 
     Returns a reduced grid if elimination was successful.
     Returns False if elimination leads to an invalid state (e.g: invalid assignment)
-    '''
+    """ 
     cell = 0
 
     while cell < 81:
@@ -255,7 +251,9 @@ def search(grid, depth):
 
     # Pick one of the possibilities of min ndx and ensure we don't create an
     # invalid state by assigning this value.
-    possibilities = grid[min_ndx]
+    possibilities = list(grid[min_ndx])
+
+    random.shuffle(possibilities)
 
     for p in possibilities:
         recurse_grid = grid.copy()
@@ -271,18 +269,17 @@ def search(grid, depth):
 
 
 def solve(sudoku):
-    '''
+    """ 
     Solve sudoku!
 
-    sudoku: 81 character string representing input sudoku
+    sudoku: 81-character string representing input sudoku
 
-    Returns a dictionary mapping keys [0-80] to a solution (a set object).
-    Returns False if input is invalid
-    '''
-    if not is_valid_input(sudoku):
-        return False
+    Returns an 81-character solution for the input sudoku. 
+    Raises InvalidSudokuError if input is invalid.
+    """ 
+    _ = validate(sudoku)
 
-    return search(str_to_grid(sudoku, True), 0)
+    return grid_to_str(search(str_to_grid(sudoku, fill_possibilities=True), 0))
 
 # Initialize and identify adjacents for all cells
 for row in range(0,9):
@@ -341,7 +338,8 @@ if __name__ == '__main__':
         solution = solve(sudoku)
         end = time.time()
 
-        if solution and is_solved(solution) and is_valid_solution(solution):
+        if is_solved(solution):
+            # We have a solution. Decide how to display solution
             if args.prettyprint:
                 display(sudoku, "Input #" + str(ndx+1))
                 display(solution, "Solution")
@@ -350,10 +348,10 @@ if __name__ == '__main__':
                     print 'Sudoku,Solution,Computation_Time(s),Max_Search_Depth'
                     header_printed = True
 
-                print '{0},{1},{2:.3f},{3}'.format(sudoku, grid_to_str(solution), end-start, max_depth)
+                print '{0},{1},{2:.3f},{3}'.format(sudoku, solution, end-start, max_depth)
             else:
                 print sudoku
-                print '>', grid_to_str(solution)
+                print '>', solution
             if not args.dfprint and not args.nostat:
                 print '>>Solved in {0:.3f}s with max depth {1}'.format(end-start, max_depth)
             max_depth = 0
@@ -361,5 +359,6 @@ if __name__ == '__main__':
             if args.prettyprint:
                 display(sudoku)
         else:
+            # Will we ever reach here?
             print '\tHmm...Can\'t solve this puzzle'
             display(solution, 'Unsolved state')
