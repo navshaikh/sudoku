@@ -317,7 +317,8 @@ if __name__ == '__main__':
     p_group.add_argument('-df', '--dfprint', action='store_true', \
                         help='Print sudoku and its solution in dataframe-friendly \
                             format. Headers included')
-    p_group.add_argument('-r', '--randomize', action='store_true', \
+
+    parser.add_argument('-r', '--randomize', action='store_true', \
                         help='Randomize tree traversal when solving. For fun!')
 
     args = parser.parse_args()
