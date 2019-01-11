@@ -44,7 +44,8 @@ def grid_to_str(grid):
 
 def display(sudoku, header=None):
     """
-    Pretty print sudoku to stdout with an optional header message.
+    Return a 'pretty print' sudoku string (2d) with an optional
+    header message.
 
     input: 81 characters of sudoku sequence or a dict with keys [0-80]
     and possible assignments as values
