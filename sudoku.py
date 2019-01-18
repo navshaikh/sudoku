@@ -120,6 +120,9 @@ def validate(sudoku):
     Returns True if input 81-char sudoku string is valid (like no repeating
     chars in any row), raises InvalidSudokuError otherwise.
     """
+    if not isinstance(sudoku, basestring):
+        raise InvalidSudokuError('Input must be an 81-character string')
+
     # Ensure input string is always 81 characters
     if not sudoku or len(sudoku) != 81:
         raise InvalidSudokuError('Input length is {0}. Expecting 81 characters'

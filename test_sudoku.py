@@ -9,6 +9,9 @@ class SudokuTest(unittest.TestCase):
         self.assertRaisesRegexp(InvalidSudokuError, 'Input length is .* 81 characters',\
                                 sudoku.solve, '')
 
+    def test_is_str(self):
+        self.assertRaisesRegexp(InvalidSudokuError, 'Input must be .*81-character string', sudoku.solve, 1)
+
     def test_less_81_char(self):
         bad_input  = '.1...8...3.472169...6....1....9.253..421.378..358.6....9....1...213874.9...5...2'
         self.assertRaisesRegexp(InvalidSudokuError, 'Input length is 80.*81 characters',\
