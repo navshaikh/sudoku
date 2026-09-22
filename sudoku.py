@@ -94,7 +94,7 @@ def get_square_indices(row, col):
     Given row and col of a cell, find all adjacent cells in its square.
     Return a list of zero-based indices
     """
-    sq_row, sq_col = row/3, col/3
+    sq_row, sq_col = row//3, col//3
     # Identify the start location of square index in the grid
     sq_start_ndx = (sq_row*9*3) + (sq_col*3)
     sq_indices = [sq_start_ndx+c for c in [0, 1, 2, 9, 10, 11, 18, 19, 20]]
@@ -120,7 +120,7 @@ def validate(sudoku):
     Returns True if input 81-char sudoku string is valid (like no repeating
     chars in any row), raises InvalidSudokuError otherwise.
     """
-    if sudoku is None or not isinstance(sudoku, basestring):
+    if sudoku is None or not isinstance(sudoku, str):
         raise InvalidSudokuError('Input must be an 81-character string')
 
     # Ensure input string is always 81 characters
@@ -133,7 +133,7 @@ def validate(sudoku):
     for ndx, s in enumerate(sudoku):
         # Initially assigned cell
         if s in '123456789':
-            row, col = int(ndx/9), ndx % 9
+            row, col = ndx//9, ndx % 9
             row_occurrences = [l for l, su in enumerate(sudoku[row*9:row*9+9])
                                if s == su]
 
@@ -259,7 +259,7 @@ def search(grid, randomize_traversal, depth=0):
     if max_depth > 81:
         # In the worst case, we would have tried 81 possible assignments in a
         # given branch. Curious to find a sudoku, which leads to this.
-        print 'Max depth of {0} reached. Returning..'.format(max_depth)
+        print('Max depth of {0} reached. Returning..'.format(max_depth))
         return False
 
     # Start with reduction
@@ -365,7 +365,7 @@ if __name__ == '__main__':
     if args.puzzle:
         puzzles.append(args.puzzle)
     else:
-        with open(args.input, 'rb') as sudoku_input:
+        with open(args.input, 'r') as sudoku_input:
             puzzles = sudoku_input.readlines()
 
     header_printed = False
@@ -383,26 +383,26 @@ if __name__ == '__main__':
         if is_solved(solution):
             # We have a solution. Decide how to display solution
             if args.prettyprint:
-                print display(sudoku, "Input #" + str(ndx+1))
-                print display(solution, "Solution")
+                print(display(sudoku, "Input #" + str(ndx+1)))
+                print(display(solution, "Solution"))
             elif args.dfprint:
                 if not header_printed:
-                    print 'Sudoku,Solution,Computation_Time(s),Max_Search_Depth'
+                    print('Sudoku,Solution,Computation_Time(s),Max_Search_Depth')
                     header_printed = True
 
-                print '{0},{1},{2:.3f},{3}'.format(sudoku, solution,
-                                                   end-start, max_depth)
+                print('{0},{1},{2:.3f},{3}'.format(sudoku, solution,
+                                                   end-start, max_depth))
             else:
-                print sudoku
-                print '>', solution
+                print(sudoku)
+                print('>', solution)
             if not args.dfprint and not args.nostat:
-                print '>>Solved in {0:.3f}s with max depth {1}' \
-                      .format(end-start, max_depth)
+                print('>>Solved in {0:.3f}s with max depth {1}'
+                      .format(end-start, max_depth))
             max_depth = 0
         elif not solution:
             if args.prettyprint:
-                print display(sudoku)
+                print(display(sudoku))
         else:
             # Will we ever reach here?
-            print '\tHmm...Can\'t solve this puzzle'
-            print display(solution, 'Unsolved state')
+            print('\tHmm...Can\'t solve this puzzle')
+            print(display(solution, 'Unsolved state'))

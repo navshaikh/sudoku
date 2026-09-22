@@ -1,6 +1,9 @@
 ## Sudoku Solver
 This program solves any sudoku puzzle using backtracking (depth-first search).
 
+### Requirements
+Python 3.9+ (verified on Python 3.12.13). No third-party dependencies.
+
 ### Command-line usage
 
 ```bash

@@ -6,23 +6,23 @@ class SudokuTest(unittest.TestCase):
 
     def test_empty_str(self):
         self.assertRaises(InvalidSudokuError, sudoku.solve, '')
-        self.assertRaisesRegexp(InvalidSudokuError, 'Input length is .* 81 characters',\
+        self.assertRaisesRegex(InvalidSudokuError, 'Input length is .* 81 characters',\
                                 sudoku.solve, '')
 
     def test_is_str(self):
-        self.assertRaisesRegexp(InvalidSudokuError, 'Input must be .*81-character string', sudoku.solve, 1)
+        self.assertRaisesRegex(InvalidSudokuError, 'Input must be .*81-character string', sudoku.solve, 1)
 
     def test_none_input(self):
-        self.assertRaisesRegexp(InvalidSudokuError, 'Input must be .*81-character string', sudoku.solve, None)
+        self.assertRaisesRegex(InvalidSudokuError, 'Input must be .*81-character string', sudoku.solve, None)
     
     def test_less_81_char(self):
         bad_input  = '.1...8...3.472169...6....1....9.253..421.378..358.6....9....1...213874.9...5...2'
-        self.assertRaisesRegexp(InvalidSudokuError, 'Input length is 80.*81 characters',\
+        self.assertRaisesRegex(InvalidSudokuError, 'Input length is 80.*81 characters',\
                                 sudoku.solve, bad_input)
         
     def test_more_81_char(self):
         bad_input  = '.1...8...3.472169...6....1....9.253..421.378..358.6....9....1...213874.9...5...2..'
-        self.assertRaisesRegexp(InvalidSudokuError, 'Input length is 82.*81 characters',\
+        self.assertRaisesRegex(InvalidSudokuError, 'Input length is 82.*81 characters',\
                                 sudoku.solve, bad_input)
 
     def test_eq_81_char(self):
@@ -37,37 +37,37 @@ class SudokuTest(unittest.TestCase):
 
     def test_contradicting_row(self):
         # Test for invalid input where a number appears more than once in any sudoku row
-        self.assertRaisesRegexp(InvalidSudokuError, '1 appears 2x in row 1',\
+        self.assertRaisesRegex(InvalidSudokuError, '1 appears 2x in row 1',\
                                 sudoku.solve,
                                 '1..1.............................................................................')
-        self.assertRaisesRegexp(InvalidSudokuError, '1 appears 2x in row 9',\
+        self.assertRaisesRegex(InvalidSudokuError, '1 appears 2x in row 9',\
                                 sudoku.solve,
                                 '...............................................................................11')
-        self.assertRaisesRegexp(InvalidSudokuError, '1 appears 2x in row 8',\
+        self.assertRaisesRegex(InvalidSudokuError, '1 appears 2x in row 8',\
                                 sudoku.solve,
                                 '...............................................................1.......1.........')  
 
     def test_contradicting_col(self):
         # Test for invalid input where a number appears more than once in any sudoku col
-        self.assertRaisesRegexp(InvalidSudokuError, '1 appears 2x in col 1',\
+        self.assertRaisesRegex(InvalidSudokuError, '1 appears 2x in col 1',\
                                 sudoku.solve,
                                 '1........1.......................................................................')
-        self.assertRaisesRegexp(InvalidSudokuError, '1 appears 2x in col 1',\
+        self.assertRaisesRegex(InvalidSudokuError, '1 appears 2x in col 1',\
                                 sudoku.solve,
                                 '1.......................................................................1........')
-        self.assertRaisesRegexp(InvalidSudokuError, '1 appears 2x in col 9',\
+        self.assertRaisesRegex(InvalidSudokuError, '1 appears 2x in col 9',\
                                 sudoku.solve,
                                 '........1.......................................................................1')
 
     def test_contradicting_sq(self):
         # Test for invalid input where a number appears more than once in any sudoku sq
-        self.assertRaisesRegexp(InvalidSudokuError, '9 appears 2x in a square',\
+        self.assertRaisesRegex(InvalidSudokuError, '9 appears 2x in a square',\
                                 sudoku.solve,
                                 '9.........9......................................................................')
-        self.assertRaisesRegexp(InvalidSudokuError, '9 appears 2x in a square',\
+        self.assertRaisesRegex(InvalidSudokuError, '9 appears 2x in a square',\
                                 sudoku.solve,
                                 '.....................................................................9..........9')
-        self.assertRaisesRegexp(InvalidSudokuError, '9 appears 2x in a square',\
+        self.assertRaisesRegex(InvalidSudokuError, '9 appears 2x in a square',\
                                 sudoku.solve,
                                 '..............................9...................9..............................')
 
@@ -78,7 +78,7 @@ class SudokuTest(unittest.TestCase):
 
     def test_easy_cases(self):
         lines = []
-        with open('data/easy_10_sudoku.txt', 'rb') as input_handler:
+        with open('data/easy_10_sudoku.txt', 'r') as input_handler:
             lines = input_handler.readlines()
 
         for puzzle in lines:
@@ -87,7 +87,7 @@ class SudokuTest(unittest.TestCase):
 
     def test_evil_cases(self):
         lines = []
-        with open('data/evil_10_sudoku.txt', 'rb') as input_handler:
+        with open('data/evil_10_sudoku.txt', 'r') as input_handler:
             lines = input_handler.readlines()
 
         for puzzle in lines:
